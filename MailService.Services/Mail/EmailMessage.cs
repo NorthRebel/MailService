@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MailService.Services.Mail
+﻿namespace MailService.Services.Mail
 {
     /// <summary>
     /// Message which will be sent to the recipient.
@@ -10,38 +8,27 @@ namespace MailService.Services.Mail
         /// <summary>
         /// Default constructor
         /// </summary>
-        /// <param name="fromAddress">Address with which the message will be sent</param>
+        /// <param name="sender">Address with which the message will be sent</param>
+        /// <param name="recipient">Address which will receive the message</param>
         /// <param name="subject">Short description of the message</param>
         /// <param name="content">Main content of the message</param>
-        /// <param name="toAddresses">List of recipients which who will receive the message</param>
-        public EmailMessage(EmailAddress fromAddress, string subject, string content, List<EmailAddress> toAddresses)
+        public EmailMessage(EmailAddress sender, EmailAddress recipient, string subject, string content)
         {
-            FromAddress = fromAddress;
+            Sender = sender;
+            Recipient = recipient;
             Subject = subject;
             Content = content;
-            ToAddresses = toAddresses;
         }
 
         /// <summary>
-        /// Constructor without set recipients
+        /// Address which will receive the message.
         /// </summary>
-        /// <param name="fromAddress">Address with which the message will be sent</param>
-        /// <param name="subject">Short description of the message</param>
-        /// <param name="content">Main content of the message</param>
-        public EmailMessage(EmailAddress fromAddress, string subject, string content) 
-            : this(fromAddress, subject, content, new List<EmailAddress>())
-        {
-        }
-
-        /// <summary>
-        /// List of recipients which who will receive the message.
-        /// </summary>
-        public List<EmailAddress> ToAddresses { get; set; }
+        public EmailAddress Recipient { get; }
 
         /// <summary>
         /// Address with which the message will be sent.
         /// </summary>
-        public EmailAddress FromAddress { get; }
+        public EmailAddress Sender { get; }
 
         /// <summary>
         /// Short description of the message.

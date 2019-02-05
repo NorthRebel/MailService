@@ -8,7 +8,7 @@ namespace MailService.Services.Mail
     public interface IEmailService
     {
         /// <summary>
-        /// Send <see cref="EmailMessage"/> to recipients.
+        /// Send <see cref="EmailMessage"/> to recipient.
         /// </summary>
         /// <param name="message">Message to send</param>
         Task SendAsync(EmailMessage message);

@@ -1,5 +1,4 @@
 ﻿using MimeKit;
-using System.Linq;
 using MimeKit.Text;
 using MailKit.Net.Smtp;
 using System.Threading.Tasks;
@@ -47,14 +46,21 @@ namespace MailService.Infrastructure.Mail
         /// <summary>
         /// Creates and configures mime message with plain text.
         /// </summary>
-        /// <param name="message">Message with sender and recipients information</param>
+        /// <param name="message">Message with sender and recipient information</param>
         /// <returns>MIME message</returns>
         private MimeMessage CreateMessage(EmailMessage message)
         {
             var msg = new MimeMessage();
 
-            msg.From.Add(new MailboxAddress(message.FromAddress.Name, message.FromAddress.Address));
-            msg.To.AddRange(message.ToAddresses.Select(m => new MailboxAddress(m.Name, m.Address)));
+            msg.From.Add(new MailboxAddress(
+                message.Sender.Name, 
+                message.Sender.Address
+                ));
+
+            msg.To.Add(new MailboxAddress(
+                message.Recipient.Name, 
+                message.Recipient.Address
+                ));
 
             msg.Subject = message.Subject;
             msg.Body = new TextPart(TextFormat.Plain)
