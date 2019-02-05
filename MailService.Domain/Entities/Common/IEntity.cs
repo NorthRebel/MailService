@@ -1,4 +1,4 @@
-﻿namespace MailService.Domain.Common
+﻿namespace MailService.Domain.Entities.Common
 {
     /// <summary>
     /// Adds necessary identity property for entity.

@@ -1,7 +1,7 @@
-﻿namespace MailService.Domain
+﻿namespace MailService.Domain.Entities
 {
     /// <summary>
-    /// Result of sending message from sender to the <see cref="Domain.Recipient"/>.
+    /// Result of sending message from sender to the <see cref="Recipient"/>.
     /// </summary>
     public enum CorrespondenceResult : byte
     {

@@ -1,8 +1,8 @@
 ﻿using System;
-using MailService.Domain.Common;
 using System.Collections.Generic;
+using MailService.Domain.Entities.Common;
 
-namespace MailService.Domain
+namespace MailService.Domain.Entities
 {
     /// <summary>
     /// Entity of mail message, which sent to <see cref="Recipient"/>.

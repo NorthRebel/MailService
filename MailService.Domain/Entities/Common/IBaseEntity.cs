@@ -1,4 +1,4 @@
-﻿namespace MailService.Domain.Common
+﻿namespace MailService.Domain.Entities.Common
 {
     /// <summary>
     /// Indicator for domain entities for not to be confused with other types

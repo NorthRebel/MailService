@@ -1,10 +1,10 @@
 ﻿using System;
-using MailService.Domain.Common;
+using MailService.Domain.Entities.Common;
 
-namespace MailService.Domain
+namespace MailService.Domain.Entities
 {
     /// <summary>
-    /// Entity of correspondence in which the exchange of message takes place between sender and <see cref="Domain.Recipient"/>.
+    /// Entity of correspondence in which the exchange of message takes place between sender and <see cref="Entities.Recipient"/>.
     /// </summary>
     public class Correspondence : IBaseEntity
     {
@@ -19,11 +19,11 @@ namespace MailService.Domain
         public int RecipientId { get; set; }
 
         /// <summary>
-        /// Date of the message was sent to the <see cref="Domain.Recipient"/>.
+        /// Date of the message was sent to the <see cref="Entities.Recipient"/>.
         /// </summary>
         public DateTime SendDate { get; set; }
 
-        /// <inheritdoc cref="Domain.CorrespondenceResult"/>
+        /// <inheritdoc cref="CorrespondenceResult"/>
         public CorrespondenceResult Result { get; set; }
 
         /// <summary>
@@ -31,10 +31,10 @@ namespace MailService.Domain
         /// </summary>
         public string ErrorMessage { get; set; }
 
-        /// <inheritdoc cref="Domain.Message"/>
+        /// <inheritdoc cref="Entities.Message"/>
         public Message Message { get; set; }
 
-        /// <inheritdoc cref="Domain.Recipient"/>
+        /// <inheritdoc cref="Entities.Recipient"/>
         public Recipient Recipient { get; set; }
     }
 }
