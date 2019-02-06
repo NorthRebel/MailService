@@ -22,5 +22,12 @@ namespace MailService.Domain.Repositories
         /// <param name="id">Id of recipient</param>
         /// <returns>Instance of recipient</returns>
         Task<Recipient> GetById(int id);
+
+        /// <summary>
+        /// Gets recipient by email
+        /// </summary>
+        /// <param name="email">Email of recipient</param>
+        /// <returns>Instance of recipient</returns>
+        Task<Recipient> GetByEmail(string email);
     }
 }

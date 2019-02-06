@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using MailService.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using MailService.Domain.Repositories;
 using MailService.Domain.Repositories.Common;
 
@@ -24,6 +25,13 @@ namespace MailService.Persistence.Repositories
         public async Task<Recipient> GetById(int id)
         {
             Recipient recipient = await _context.Recipients.FindAsync(id);
+
+            return recipient;
+        }
+
+        public async Task<Recipient> GetByEmail(string email)
+        {
+            Recipient recipient = await _context.Recipients.SingleOrDefaultAsync(r => r.Email == email);
 
             return recipient;
         }
