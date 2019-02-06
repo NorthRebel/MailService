@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using System;
+using Microsoft.AspNetCore;
 using MailService.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -14,8 +15,15 @@ namespace MailService.API
 
             using (var scope = host.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetService<MailServiceDbContext>();
-                context.Database.Migrate();
+                try
+                {
+                    var context = scope.ServiceProvider.GetService<MailServiceDbContext>();
+                    context.Database.Migrate();
+                }
+                catch
+                {
+                    // Use logger
+                }
             }
 
             host.Run();
