@@ -31,6 +31,6 @@ namespace MailService.API.Models
         /// <summary>
         /// List of exchange results of message between sender and recipient.
         /// </summary>
-        public ICollection<RecipientCorrespondence> Correspondences { get; set; }
+        public IEnumerable<RecipientCorrespondence> Correspondences { get; set; }
     }
 }

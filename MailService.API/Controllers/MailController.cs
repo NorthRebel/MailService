@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using MailService.API.Infrastructure;
@@ -63,18 +64,18 @@ namespace MailService.API.Controllers
             {
                 Correspondence correspondence =
                     await SendMessage(messageId,
-                                      recipient.Id,
-                                      new EmailAddress(_emailSender.Address) { Name = _emailSender.Name },
-                                      new EmailAddress(recipient.Email),
-                                      message.Subject,
-                                      message.Body);
+                        recipient.Id,
+                        new EmailAddress(_emailSender.Address) { Name = _emailSender.Name },
+                        new EmailAddress(recipient.Email),
+                        message.Subject,
+                        message.Body);
 
                 _correspondenceRepository.Add(correspondence);
             }
 
             await _correspondenceRepository.UnitOfWork.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(Show), 1);
+            return CreatedAtAction(nameof(Show), new { messageId }, "Hello!");
         }
 
         private async Task<int> CreateNewMessage(string subject, string body)
@@ -113,7 +114,8 @@ namespace MailService.API.Controllers
             return recipients;
         }
 
-        private async Task<Correspondence> SendMessage(int messageId, int recipientId, EmailAddress sender, EmailAddress recipient, string subject, string body)
+        private async Task<Correspondence> SendMessage(int messageId, int recipientId, EmailAddress sender,
+            EmailAddress recipient, string subject, string body)
         {
             var correspondence = new Correspondence { MessageId = messageId, RecipientId = recipientId };
 
@@ -135,15 +137,87 @@ namespace MailService.API.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<SentMessage>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Show()
         {
-            return Ok();
+            IEnumerable<Message> messages = await _messageRepository.GetAll();
+
+            var result = new List<SentMessage>();
+
+            foreach (Message message in messages)
+            {
+                var sentMessage = new SentMessage
+                {
+                    Id = message.Id,
+                    Subject = message.Subject,
+                    Body = message.Body,
+                    CreateDate = message.CreateDate
+                };
+
+                sentMessage.Correspondences = await GetCorrespondenceOfMessage(message.Id);
+                
+                result.Add(sentMessage);
+            }
+            
+            if (result.Any())
+                return Ok(result);
+
+            return NoContent();
         }
 
-        [HttpGet("/{messageId:int}")]
+        [HttpGet("{messageId:int}")]
+        [ProducesResponseType(typeof(SentMessage), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public async Task<IActionResult> Show(int messageId)
         {
-            return Ok();
+            Message message = await _messageRepository.GetById(messageId);
+
+            if (message != null)
+            {
+                var result = new SentMessage
+                {
+                    Id = message.Id,
+                    Subject = message.Subject,
+                    Body = message.Body,
+                    CreateDate = message.CreateDate
+                };
+
+                result.Correspondences = await GetCorrespondenceOfMessage(messageId);
+
+                return Ok(result);
+            }
+
+            return NotFound();
+        }
+
+        private async Task<IEnumerable<RecipientCorrespondence>> GetCorrespondenceOfMessage(int messageId)
+        {
+            var result = new List<RecipientCorrespondence>();
+
+            IEnumerable<Correspondence> correspondences = await _correspondenceRepository.GetAllByMessageId(messageId);
+
+            foreach (Correspondence correspondence in correspondences)
+            {
+                Recipient recipient = await _recipientRepository.GetById(correspondence.RecipientId);
+                if (recipient != null)
+                {
+                    var recipientCorrespondence = new RecipientCorrespondence
+                    {
+                        Email = recipient.Email,
+                        ErrorMessage = correspondence.ErrorMessage,
+                        SendDate = correspondence.SendDate
+                    };
+
+                    Enum.TryParse<Models.CorrespondenceResult>(correspondence.Result.ToString(),
+                        out var correspondenceResult);
+                    recipientCorrespondence.Result = correspondenceResult;
+
+                    result.Add(recipientCorrespondence);
+                }
+            }
+
+            return result;
         }
     }
 }
