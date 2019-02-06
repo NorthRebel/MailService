@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using MailService.API.Infrastructure;
 using MailService.API.Models;
 using MailService.Domain.Entities;
 using MailService.Domain.Repositories;
@@ -28,21 +29,32 @@ namespace MailService.API.Controllers
         /// <inheritdoc cref="IEmailService"/>
         private readonly IEmailService _emailService;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly IEmailSender _emailSender;
+
         public MailController(ICorrespondenceRepository correspondenceRepository,
             IRecipientRepository recipientRepository,
             IMessageRepository messageRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            IEmailSender emailSender)
         {
             _correspondenceRepository = correspondenceRepository;
             _recipientRepository = recipientRepository;
             _messageRepository = messageRepository;
             _emailService = emailService;
+            _emailSender = emailSender;
         }
 
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> Send([FromBody] MessageToSend message)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
+
             int messageId = await CreateNewMessage(message.Subject, message.Body);
 
             IEnumerable<Recipient> recipients = await SaveRecipients(message.Recipients);
@@ -52,7 +64,7 @@ namespace MailService.API.Controllers
                 Correspondence correspondence =
                     await SendMessage(messageId,
                                       recipient.Id,
-                                      new EmailAddress(""),
+                                      new EmailAddress(_emailSender.Address) { Name = _emailSender.Name },
                                       new EmailAddress(recipient.Email),
                                       message.Subject,
                                       message.Body);
