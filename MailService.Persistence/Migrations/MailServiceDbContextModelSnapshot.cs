@@ -70,6 +70,11 @@ namespace MailService.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasName("IX_Email")
+                        .HasFilter("[Email] IS NOT NULL");
+
                     b.ToTable("Recipients");
                 });
 

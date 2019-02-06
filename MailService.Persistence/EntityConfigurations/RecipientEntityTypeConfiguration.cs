@@ -13,6 +13,10 @@ namespace MailService.Persistence.EntityConfigurations
 
             builder.Property(e => e.Email)
                 .HasMaxLength(255);
+
+            builder.HasIndex(e => e.Email)
+                .IsUnique()
+                .HasName("IX_Email");
         }
     }
 }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MailService.Persistence.Migrations
 {
     [DbContext(typeof(MailServiceDbContext))]
-    [Migration("20190205193706_Initial")]
+    [Migration("20190206075607_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,6 +71,11 @@ namespace MailService.Persistence.Migrations
                         .HasMaxLength(255);
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasName("IX_Email")
+                        .HasFilter("[Email] IS NOT NULL");
 
                     b.ToTable("Recipients");
                 });

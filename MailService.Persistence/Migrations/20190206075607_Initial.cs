@@ -67,6 +67,13 @@ namespace MailService.Persistence.Migrations
                 name: "IX_Correspondences_RecipientId",
                 table: "Correspondences",
                 column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Email",
+                table: "Recipients",
+                column: "Email",
+                unique: true,
+                filter: "[Email] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
