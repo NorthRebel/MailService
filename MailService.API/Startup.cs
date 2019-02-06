@@ -13,15 +13,29 @@ namespace MailService.API
     using MailService.Infrastructure.Mail;
     using MailService.Persistence.Repositories;
 
+    /// <summary>
+    /// Configures web application 
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// Configuration of application that stored in appsettings.json
+        /// </summary>
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Constructor that inject configuration of application that stored in appsettings.json
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Configures services of web app
+        /// </summary>
+        /// <param name="services">Native IoC-Container</param>
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureDbContext(services);
@@ -31,12 +45,18 @@ namespace MailService.API
             services.AddMvc();
         }
 
+        /// <summary>
+        /// Configures EF Core database context
+        /// </summary>
         private void ConfigureDbContext(IServiceCollection services)
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<MailServiceDbContext>(options => options.UseSqlServer(connectionString));
         }
 
+        /// <summary>
+        /// Injects implementation of abstract services
+        /// </summary>
         private void BindServices(IServiceCollection services)
         {
             services.AddScoped<IEmailService, EmailService>();
@@ -44,6 +64,9 @@ namespace MailService.API
             services.AddSingleton<IEmailSender>(Configuration.GetSection("SenderCredentials").Get<EmailSender>());
         }
 
+        /// <summary>
+        /// Injects implementation of abstract repositories
+        /// </summary>
         private void BindRepositories(IServiceCollection services)
         {
             services.AddScoped<IMessageRepository, MessageRepository>();
@@ -51,6 +74,9 @@ namespace MailService.API
             services.AddScoped<ICorrespondenceRepository, CorrespondenceRepository>();
         }
 
+        /// <summary>
+        /// Configures CORS policy to allow access for all clients
+        /// </summary>
         private void ConfigureCORS(IServiceCollection services)
         {
             services.AddCors(o => o.AddPolicy("AllowAll",

@@ -6,7 +6,7 @@
     public class EmailMessage
     {
         /// <summary>
-        /// Default constructor
+        /// Creates email message
         /// </summary>
         /// <param name="sender">Address with which the message will be sent</param>
         /// <param name="recipient">Address which will receive the message</param>

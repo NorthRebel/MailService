@@ -6,7 +6,7 @@
     public class EmailAddress
     {
         /// <summary>
-        /// Default constructor
+        /// Creates user credentials that contain only address
         /// </summary>
         /// <param name="address">Email address</param>
         public EmailAddress(string address)
@@ -15,13 +15,23 @@
         }
 
         /// <summary>
+        /// Creates user credentials that contain full information
+        /// </summary>
+        /// <param name="address">Email address</param>
+        public EmailAddress(string address, string name)
+        {
+            Address = address;
+            Name = name;
+        }
+
+        /// <summary>
         /// Name of user
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Email address
         /// </summary>
-        public string Address { get; set; }
+        public string Address { get; }
     }
 }

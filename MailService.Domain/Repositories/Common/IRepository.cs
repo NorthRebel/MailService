@@ -9,7 +9,10 @@ namespace MailService.Domain.Repositories.Common
     /// <typeparam name="TEntity">Type of entity which belongs to repository</typeparam>
     public interface IRepository<TEntity> where TEntity: IBaseEntity
     {
-        /// <inheritdoc cref="IUnitOfWork"/>
+        /// <summary>
+        /// Serves a set of objects that are modified in a business transaction (business action)
+        /// and manages the recording of changes and the resolution of data contention problems.
+        /// </summary>
         IUnitOfWork UnitOfWork { get; }
     }
 }

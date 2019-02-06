@@ -14,6 +14,9 @@ namespace MailService.API.Controllers
 {
     using CorrespondenceResult = Domain.Entities.CorrespondenceResult;
 
+    /// <summary>
+    /// MVC controller to access REST service
+    /// </summary>
     [ApiController]
     [Route("api/mails")]
     public class MailController : Controller
@@ -30,11 +33,17 @@ namespace MailService.API.Controllers
         /// <inheritdoc cref="IEmailService"/>
         private readonly IEmailService _emailService;
 
-        /// <summary>
-        /// 
-        /// </summary>
+        /// <inheritdoc cref="IEmailSender"/>
         private readonly IEmailSender _emailSender;
 
+        /// <summary>
+        /// Constructor that used to inject external dependencies
+        /// </summary>
+        /// <param name="correspondenceRepository">Repository for manage set of <see cref="Correspondence"/> entities</param>
+        /// <param name="recipientRepository">Repository for manage set of <see cref="Recipient"/> entities</param>
+        /// <param name="messageRepository">Repository for manage set of <see cref="Message"/> entities</param>
+        /// <param name="emailService">Service to work with mail</param>
+        /// <param name="emailSender">Credentials that used to send messages</param>
         public MailController(ICorrespondenceRepository correspondenceRepository,
             IRecipientRepository recipientRepository,
             IMessageRepository messageRepository,
@@ -48,6 +57,11 @@ namespace MailService.API.Controllers
             _emailSender = emailSender;
         }
 
+        /// <summary>
+        /// Creates an email message and sends it to recipients.
+        /// Sending result is saved to database.
+        /// </summary>
+        /// <param name="message">Message to send that include recipients</param>
         [HttpPost]
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
@@ -56,19 +70,21 @@ namespace MailService.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            int messageId = await CreateNewMessage(message.Subject, message.Body);
+            int messageId = await SaveMessage(message.Subject, message.Body);
 
             IEnumerable<Recipient> recipients = await SaveRecipients(message.Recipients);
 
             foreach (Recipient recipient in recipients)
             {
                 Correspondence correspondence =
-                    await SendMessage(messageId,
-                        recipient.Id,
-                        new EmailAddress(_emailSender.Address) { Name = _emailSender.Name },
+                    await SendMessage(
+                        new EmailAddress(_emailSender.Address, _emailSender.Name),
                         new EmailAddress(recipient.Email),
                         message.Subject,
                         message.Body);
+
+                correspondence.MessageId = messageId;
+                correspondence.RecipientId = recipient.Id;
 
                 _correspondenceRepository.Add(correspondence);
             }
@@ -78,7 +94,14 @@ namespace MailService.API.Controllers
             return CreatedAtAction(nameof(Show), new { messageId }, "Hello!");
         }
 
-        private async Task<int> CreateNewMessage(string subject, string body)
+
+        /// <summary>
+        /// Saves the message to the database.
+        /// </summary>
+        /// <param name="subject">Short description of the message</param>
+        /// <param name="body">Main content of the message</param>
+        /// <returns>Identity number that stored in DB</returns>
+        private async Task<int> SaveMessage(string subject, string body)
         {
             var newMsg = new Message
             {
@@ -92,6 +115,12 @@ namespace MailService.API.Controllers
             return newMsg.Id;
         }
 
+        /// <summary>
+        /// Saves email addresses of recipients to the database.
+        /// And returns his ids that stored in DB.
+        /// </summary>
+        /// <param name="recipientMails">Email addresses of recipients</param>
+        /// <returns>List recipients with id and mail</returns>
         private async Task<IEnumerable<Recipient>> SaveRecipients(IEnumerable<string> recipientMails)
         {
             var recipients = new List<Recipient>();
@@ -114,10 +143,17 @@ namespace MailService.API.Controllers
             return recipients;
         }
 
-        private async Task<Correspondence> SendMessage(int messageId, int recipientId, EmailAddress sender,
-            EmailAddress recipient, string subject, string body)
+        /// <summary>
+        /// Sends message to the recipient and process result of operation.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="recipient"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        private async Task<Correspondence> SendMessage(EmailAddress sender, EmailAddress recipient, string subject, string body)
         {
-            var correspondence = new Correspondence { MessageId = messageId, RecipientId = recipientId };
+            var correspondence = new Correspondence();
 
             try
             {
@@ -136,6 +172,10 @@ namespace MailService.API.Controllers
             return correspondence;
         }
 
+        /// <summary>
+        /// Returns a list of all sent messages including correspondence result information 
+        /// </summary>
+        /// <returns>List of all sent messages</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<SentMessage>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -166,6 +206,11 @@ namespace MailService.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Gets information about sent message including correspondence result
+        /// </summary>
+        /// <param name="messageId">Sent message id</param>
+        /// <returns>Information about sent message</returns>
         [HttpGet("{messageId:int}")]
         [ProducesResponseType(typeof(SentMessage), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -191,6 +236,11 @@ namespace MailService.API.Controllers
             return NotFound();
         }
 
+        /// <summary>
+        /// Gets result of correspondence by sent message
+        /// </summary>
+        /// <param name="messageId">Id of sent message</param>
+        /// <returns>Result of correspondence by sent message</returns>
         private async Task<IEnumerable<RecipientCorrespondence>> GetCorrespondenceOfMessage(int messageId)
         {
             var result = new List<RecipientCorrespondence>();

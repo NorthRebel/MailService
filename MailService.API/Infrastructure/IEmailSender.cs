@@ -1,5 +1,8 @@
 ﻿namespace MailService.API.Infrastructure
 {
+    /// <summary>
+    /// Credentials that used to send messages.
+    /// </summary>
     public interface IEmailSender
     {
         /// <summary>

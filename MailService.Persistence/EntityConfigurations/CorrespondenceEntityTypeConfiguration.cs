@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MailService.Persistence.EntityConfigurations
 {
+    /// <summary>
+    /// Configuration of <see cref="Correspondence"/> entity that used <see cref="MailServiceDbContext"/>
+    /// </summary>
     internal sealed class CorrespondenceEntityTypeConfiguration : IEntityTypeConfiguration<Correspondence>
     {
         public void Configure(EntityTypeBuilder<Correspondence> builder)

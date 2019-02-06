@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using MailService.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,10 @@ namespace MailService.API
 {
     public class Program
     {
+        /// <summary>
+        /// Entry point of application.
+        /// </summary>
+        /// <param name="args">Additional args (not used)</param>
         public static void Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
@@ -17,6 +20,7 @@ namespace MailService.API
             {
                 try
                 {
+                    // Migrates database if not exits.
                     var context = scope.ServiceProvider.GetService<MailServiceDbContext>();
                     context.Database.Migrate();
                 }
@@ -29,6 +33,11 @@ namespace MailService.API
             host.Run();
         }
 
+        /// <summary>
+        /// Configures host to run web application
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
