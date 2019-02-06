@@ -22,5 +22,12 @@ namespace MailService.Domain.Repositories
         /// </summary>
         /// <returns>List of sent messages</returns>
         Task<IEnumerable<Message>> GetAll();
+
+        /// <summary>
+        /// Get sent message by id
+        /// </summary>
+        /// <param name="id">Id of sent message</param>
+        /// <returns>Instance of sent message</returns>
+        Task<Message> GetById(int id);
     }
 }

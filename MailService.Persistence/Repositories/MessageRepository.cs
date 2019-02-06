@@ -29,5 +29,12 @@ namespace MailService.Persistence.Repositories
 
             return messages;
         }
+
+        public async Task<Message> GetById(int id)
+        {
+            Message message = await _context.Messages.FindAsync(id);
+
+            return message;
+        }
     }
 }
