@@ -101,6 +101,8 @@ namespace MailService.API
 
             app.UseCors("AllowAll");
 
+            app.ConfigureCustomExceptionMiddleware();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
